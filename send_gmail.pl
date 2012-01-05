@@ -1,18 +1,48 @@
-
+#!/usr/bin/perl -w
 use strict;
 use warnings;
+use Getopt::Long;
+use Pod::Usage;
 use Net::SMTP::SSL;
 use MIME::Base64;
 use File::Spec;
 use LWP::MediaTypes;
 
+my $recepients;
+my $subject;
+my $body;
+my $attachments;
+my $help;
+
+GetOptions(
+    "recepients=s"  => \$recepients,
+    'subject=s'     => \$subject,
+    'body=s'        => \$body,
+    'attachments=s' => \$attachments,
+    'help|?'        => \$help,
+  ) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+die"Use -h, -? or --help!\n $!" unless $subject;
+
+# Send away!
+&send_mail_with_attachments( $recepients,
+  $subject, 
+  $body,
+  $attachments
+);
+
+
+
 sub send_mail_with_attachments {
+
  my $to = shift(@_);
  my $subject = shift(@_);
  my $body = shift(@_);
  my $attach = shift(@_);
  my @attachments = split(/,/, $attach);
- my $from = 'my@gmail.com';
+ my $from = 'my@mail.com';
  my $password = 'my_password';
 
  my $smtp;
@@ -100,23 +130,55 @@ sub send_mail_with_attachments {
 }
 
 
-my $input_doc = <<IN;
-usage: 
-./send_mail.pl  recep1,recep2...  subject  body  attachment1,attachment2
-IN
-my ($recepients, $subject, $body, $attachments) =
-     ($ARGV[0], $ARGV[1], $ARGV[2], $ARGV[3]);
 
-     if ($recepients !~ m/@/) {
-       print $input_doc;
-       die;
-     }
+__END__
 
-# Send away!
-&send_mail_with_attachments( $recepients,
-  $subject, 
-  $body,
-  $attachments
-);
+=head1 NAME
 
+send_mail.pl - send mail with attachments using gmail account
+
+=head1 SYNOPSIS
+
+send_mail.pl [options] parameters
+
+    
+    --help        show this help message
+    --recepients  rec1@mail.com,rec2@mail.com,...
+    --subject     Subject(without spaces)
+    --body        Message text(without spaces)
+    --attachments attachm1,attachm2 ...
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Prints a brief help message and exits.
+
+=item B<--recepients>
+
+Comma separated recepinents' Emails.
+
+=item B<--subject>
+
+Subject of message to all recepients without space characters.
+All words after space are cutted.
+
+=item B<--body>
+
+Body of message without space characters.
+All words after space are cutted.
+
+=item B<--attachments>
+
+Comma separated paths' to attachment files.
+
+=back
+
+=head1 DESCRIPTION
+
+Bsend_mail.pl recepient1,recepient2... , subject, body, attachm1,attachm2...
+
+=cut
 
