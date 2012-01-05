@@ -42,7 +42,7 @@ sub send_mail_with_attachments {
  my $body = shift(@_);
  my $attach = shift(@_);
  my @attachments = split(/,/, $attach);
- my $from = 'my@mail.com';
+ my $from = 'my@gmail.com';
  my $password = 'my_password';
 
  my $smtp;
